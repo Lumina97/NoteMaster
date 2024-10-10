@@ -1,0 +1,56 @@
+.noteTextArea {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  background-color: black;
+  color: white;
+  border-color: none;
+  border-color: none;
+  position: relative;
+  outline: none;
+  z-index: 99999999999;
+}
+
+.noteWrapperElement {
+  position: absolute;
+}
+
+.noteTrashIcon,
+.noteDisplayIcon {
+  width: 1.5rem !important;
+  min-width: 1.5rem !important;
+  max-width: 1.5rem !important;
+  height: 1.5rem !important ;
+  min-height: 1.5rem !important ;
+  max-height: 1.5rem !important ;
+  border: 2px solid green !important;
+  background-color: transparent !important;
+  position: absolute !important;
+  left: -2rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.noteTrashIcon {
+  left: -4rem !important;
+  border: 2px solid red !important;
+}
+.noteTrashIcon:hover {
+  background-color: red !important;
+}
+.noteDisplayIcon:hover {
+  background-color: green !important;
+}
+
+@media (max-width: 850px) {
+  .noteTrashIcon,
+  .noteDisplayIcon {
+    left: 0rem !important;
+    top: -1.5rem !important;
+  }
+
+  .noteTrashIcon {
+    left: 2rem !important;
+    border: 2px solid red !important;
+  }
+}
