@@ -1,13 +1,23 @@
 //current limitations:
-//Does NOT work as soon as you resize the screen
 //If you selected 3 containers and the center one is wider then both of them the note box will not  account for that
 //Box will span the entire element the text is in.
 //will break if page is reloaded in different size
 
 import { NoteObj } from "../src/noteObj";
+import {
+  GetCurrentNoteOverlayStyle,
+  ENoteOverlayStyle,
+  GetSideBar,
+  ToggleSideBar,
+  ChangeOverlayStyle,
+} from "./noteDisplayOverlay";
 
 //contains html elements for the notes.
 const pageNotes: NoteObj[] = [];
+export const GetPageNotes = () => {
+  return pageNotes;
+};
+GetSideBar();
 
 // addEventListener("beforeunload ", () => {
 //   unloadEvent();
@@ -30,7 +40,7 @@ const deleteNote = (noteWrapperElement: NoteObj) => {
   noteWrapperElement.wrapperHTML.remove();
 };
 
-const toggleNote = (textArea: HTMLTextAreaElement, displayStatus?: boolean) => {
+const toggleNote = (textArea: HTMLElement, displayStatus?: boolean) => {
   if (textArea === undefined) return;
   if (displayStatus !== undefined)
     textArea.style.display = displayStatus ? "block" : "none";
@@ -41,9 +51,15 @@ const toggleNote = (textArea: HTMLTextAreaElement, displayStatus?: boolean) => {
 };
 
 const setAllNotesDisplay = (hideNotesBoolean: boolean) => {
-  console.log(pageNotes);
-  if (pageNotes.length <= 0) return;
+  if (GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar) {
+    ToggleSideBar(hideNotesBoolean);
+    if (pageNotes.length <= 0) return;
+    for (const note of pageNotes) {
+      toggleNote(note.wrapperHTML, hideNotesBoolean);
+    }
+  }
 
+  if (pageNotes.length <= 0) return;
   for (const note of pageNotes) {
     toggleNote(note.textAreaHTML, hideNotesBoolean);
   }
@@ -59,6 +75,50 @@ const setAllNotesDisplay = (hideNotesBoolean: boolean) => {
 //   });
 // };
 
+export const SetHTMLClasses = (note: NoteObj) => {
+  note.trashIconHTML.className = "";
+  note.noteIconHTML.className = "";
+  note.textAreaHTML.className = "";
+  note.wrapperHTML.className = "";
+  note.wrapperHTML.style.cssText = "";
+
+  note.trashIconHTML.classList.add(
+    `${
+      GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar
+        ? "noteTrashIconSideBar"
+        : "noteTrashIcon"
+    }`
+  );
+  note.noteIconHTML.classList.add(
+    `${
+      GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar
+        ? "noteDisplayIconSideBar"
+        : "noteDisplayIcon"
+    }`
+  );
+  note.textAreaHTML.classList.add(
+    `${
+      GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar
+        ? "noteTextAreaSideBar"
+        : "noteTextArea"
+    }`
+  );
+
+  note.wrapperHTML.classList.add(
+    `Note${pageNotes.length}`,
+    GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar
+      ? "noteWrapperElementSideBar"
+      : "noteWrapperElement"
+  );
+
+  if (GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.overlay) {
+    note.wrapperHTML.style.width = note.width;
+    note.wrapperHTML.style.height = note.height;
+    note.wrapperHTML.style.left = note.left;
+  }
+  note.wrapperHTML.style.top = note.top;
+};
+
 ///Returns a node obj
 const createNewNote = (
   width: string,
@@ -72,21 +132,7 @@ const createNewNote = (
   const noteIcon = document.createElement("button");
   const trashIcon = document.createElement("button");
   const textArea = document.createElement("textarea");
-
-  trashIcon.classList.add("noteTrashIcon");
-  noteIcon.classList.add("noteDisplayIcon");
-  textArea.classList.add("noteTextArea");
   textArea.value = content ? content : "Enter your note here";
-
-  wrapper.appendChild(noteIcon);
-  wrapper.appendChild(trashIcon);
-  wrapper.appendChild(textArea);
-  wrapper.classList.add(`Note${pageNotes.length}`, `noteWrapperElement`);
-
-  wrapper.style.width = width;
-  wrapper.style.height = height;
-  wrapper.style.left = left;
-  wrapper.style.top = top;
 
   trashIcon.addEventListener("click", () => {
     deleteNote(Note);
@@ -100,6 +146,10 @@ const createNewNote = (
     textArea.innerHTML = (e.target as HTMLTextAreaElement).value;
   });
 
+  wrapper.appendChild(noteIcon);
+  wrapper.appendChild(trashIcon);
+  wrapper.appendChild(textArea);
+
   Note = {
     width,
     height,
@@ -111,6 +161,7 @@ const createNewNote = (
     noteIconHTML: noteIcon,
     trashIconHTML: trashIcon,
   };
+  SetHTMLClasses(Note);
 
   return Note;
 };
@@ -129,7 +180,6 @@ const createNewNote = (
 //         style.top,
 //         style.content
 //       );
-
 //       document.body.appendChild(element);
 //     }
 //   }
@@ -137,7 +187,8 @@ const createNewNote = (
 
 document.body.onkeydown = (e) => {
   if (e.key === "=") createNoteForSelectedText();
-  // if (e.key === "1") unloadEvent();
+  if (e.key === "4") ChangeOverlayStyle(ENoteOverlayStyle.overlay);
+  if (e.key === "5") ChangeOverlayStyle(ENoteOverlayStyle.sidebar);
   if (e.key === "2") setAllNotesDisplay(false);
   if (e.key === "3") setAllNotesDisplay(true);
 };
@@ -169,7 +220,6 @@ const createNoteForSelectedText = () => {
     if (sel && sel.rangeCount) {
       //get starting container of selection
       const start = sel.getRangeAt(0).startContainer.parentElement;
-      console.log(sel.getRangeAt(0));
       //get ending container - set to start if ending container does not exist
       let end = sel.getRangeAt(0).endContainer?.parentElement;
       if (!end) end = sel.getRangeAt(0).startContainer.parentElement;

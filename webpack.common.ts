@@ -4,7 +4,12 @@ import CopyWebpackPlugin from "copy-webpack-plugin";
 
 const config: webpack.Configuration = {
   entry: {
-    content: ["./src/main.ts", "./src/noteObj.ts", "./src/resize.ts"],
+    content: [
+      "./src/main.ts",
+      "./src/noteObj.ts",
+      "./src/resize.ts",
+      "./src/noteDisplayOverlay.ts",
+    ],
   },
   resolve: {
     extensions: [".ts"],
