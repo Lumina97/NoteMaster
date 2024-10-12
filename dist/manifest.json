@@ -9,11 +9,14 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
-  "permissions": ["storage", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "scripting", "contextMenus", "activeTab"],
   "content_scripts": [
     {
       "js": ["content.js"],
-      "css": ["styles.css"],
+      "css": ["styles.css", "animations.css"],
       "matches": ["<all_urls>"]
     }
   ]

@@ -1,12 +1,14 @@
-import { GetPageNotes, SetHTMLClasses } from "./main";
+import { SetHTMLClasses } from "./HTMLCreator";
+import { GetPageNotes } from "./main";
 import { ResizeAllElements } from "./resize";
 
 let sidebar: HTMLDivElement;
 const CreateSideBar = () => {
   sidebar = document.createElement("div");
-  sidebar.classList.add("NoteSideBar", "show");
+  sidebar.classList.add("NoteSideBar");
+  if (currentNoteOverlayStyle === ENoteOverlayStyle.overlay)
+    ToggleSideBar(true);
   document.body.appendChild(sidebar);
-  console.log("Created sidebar");
 };
 
 export const GetSideBar = () => {
@@ -19,7 +21,7 @@ export enum ENoteOverlayStyle {
   sidebar,
 }
 
-let currentNoteOverlayStyle: ENoteOverlayStyle = ENoteOverlayStyle.sidebar;
+let currentNoteOverlayStyle: ENoteOverlayStyle = ENoteOverlayStyle.overlay;
 export const GetCurrentNoteOverlayStyle = () => {
   return currentNoteOverlayStyle;
 };
@@ -28,12 +30,19 @@ export const ChangeOverlayStyle = (newStyle: ENoteOverlayStyle) => {
   currentNoteOverlayStyle = newStyle;
 
   for (const note of GetPageNotes()) {
-    SetHTMLClasses(note);
+    SetHTMLClasses(note, GetCurrentNoteOverlayStyle());
+    if (newStyle === ENoteOverlayStyle.overlay) {
+      document.body.appendChild(note.wrapperHTML);
+      ToggleSideBar(true);
+    } else {
+      GetSideBar().appendChild(note.wrapperHTML);
+      ToggleSideBar(false);
+    }
   }
   ResizeAllElements();
 };
 
-export const ToggleSideBar = (showSideBar: boolean) => {
-  if (showSideBar) GetSideBar().classList.add("show");
-  else GetSideBar().classList.remove("show");
+export const ToggleSideBar = (hideSideBar: boolean) => {
+  if (hideSideBar) GetSideBar().classList.add("closed");
+  else GetSideBar().classList.remove("closed");
 };

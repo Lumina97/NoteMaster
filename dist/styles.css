@@ -1,3 +1,8 @@
+:root {
+  --min-SideBarWidth: 200px;
+  --transition-Speed: 0.5s;
+}
+
 .noteTextArea,
 .noteTextAreaSideBar {
   width: 100%;
@@ -34,10 +39,11 @@
 }
 
 .noteWrapperElementSideBar {
-  left: 85%;
-  width: 15%;
-  min-width: 150px;
-  position: absolute;
+  left: 12%;
+  right: 0%;
+  width: 88%;
+  min-width: calc(var(--min-SideBarWidth) - 25px);
+  position: relative;
 }
 
 .noteTrashIcon,
@@ -89,19 +95,40 @@
 
 .NoteSideBar {
   pointer-events: none;
-  display: none;
+  display: block;
   z-index: 99999;
   position: fixed;
   width: 17%;
-  min-width: 150px;
+  min-width: var(--min-SideBarWidth);
   height: 100%;
-  right: 0;
+  right: 0%;
   top: 0;
   background-color: rgba(50, 50, 50, 0.8);
+  transition: var(--transition-Speed) ease-in-out;
+  border-left: 2rem;
+  backdrop-filter: blur(8px) saturate(2);
+  -webkit-backdrop-filter: blur(8px) saturate(2);
+  overflow: hidden;
 }
 
-.show {
-  display: block;
+.closed {
+  width: 0;
+  min-width: 0;
+}
+
+.closedOverlay {
+  display: none;
+}
+
+.noteWrapperElementSideBar.closed > * {
+  overflow: hidden;
+  padding: 0;
+  width: 0;
+  min-width: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  transition: var(--transition-Speed) ease-in-out;
 }
 
 @media (max-width: 850px) {

@@ -6,10 +6,13 @@ const config: webpack.Configuration = {
   entry: {
     content: [
       "./src/main.ts",
-      "./src/noteObj.ts",
+      "./src/NoteManager.ts",
       "./src/resize.ts",
       "./src/noteDisplayOverlay.ts",
+      "./src/HTMLCreator.ts",
+      "./src/Types.ts",
     ],
+    background: path.resolve(__dirname, "src", "ContextMenu.ts"),
   },
   resolve: {
     extensions: [".ts"],
