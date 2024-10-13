@@ -36,6 +36,37 @@ export const SetHTMLClasses = (
 };
 
 ///Returns a note obj
+export const CreateHTMLFromNote = (note: NoteObj) => {
+  const wrapper = document.createElement("div");
+  const noteIcon = document.createElement("button");
+  const trashIcon = document.createElement("button");
+  const textArea = document.createElement("textarea");
+  textArea.value = note.content ? note.content : "Enter your note here";
+
+  trashIcon.addEventListener("click", () => {
+    deleteNote(note);
+  });
+
+  noteIcon.addEventListener("click", () => {
+    const toggle = textArea.classList.contains("closedOverlay");
+    toggleNote(textArea, toggle);
+  });
+
+  textArea.addEventListener("change", (e) => {
+    textArea.innerHTML = (e.target as HTMLTextAreaElement).value;
+  });
+
+  wrapper.appendChild(noteIcon);
+  wrapper.appendChild(trashIcon);
+  wrapper.appendChild(textArea);
+
+  note.noteIconHTML = noteIcon;
+  note.textAreaHTML = textArea;
+  note.trashIconHTML = trashIcon;
+  note.wrapperHTML = wrapper;
+  return note;
+};
+
 export const createNewNoteHTML = (
   width: string,
   height: string,
@@ -56,7 +87,7 @@ export const createNewNoteHTML = (
 
   noteIcon.addEventListener("click", () => {
     const toggle = textArea.classList.contains("closedOverlay");
-    toggleNote(textArea, !toggle);
+    toggleNote(textArea, toggle);
   });
 
   textArea.addEventListener("change", (e) => {

@@ -1,6 +1,7 @@
 :root {
   --min-SideBarWidth: 200px;
   --transition-Speed: 0.5s;
+  --sidebar-blur-intensity: 5px;
 }
 
 .noteTextArea,
@@ -16,22 +17,13 @@
   outline: none;
   pointer-events: all;
   z-index: 2147483646;
-  resize: vertical;
+  resize: none;
 }
 
-/* .noteTextAreaSideBar {
-  width: 100%;
-  height: auto;
-  border-radius: 1rem;
-  background-color: black;
-  color: white;
-  border-color: none;
-  border-color: none;
-  position: relative;
-  outline: none;
-  pointer-events: all;
-  z-index: 99999999999;
-} */
+.noteTextAreaSideBar {
+  width: 88%;
+  left: 12%;
+}
 
 .noteWrapperElement {
   position: absolute;
@@ -39,9 +31,9 @@
 }
 
 .noteWrapperElementSideBar {
-  left: 12%;
+  left: 0;
   right: 0%;
-  width: 88%;
+  width: 100%;
   min-width: calc(var(--min-SideBarWidth) - 25px);
   position: relative;
 }
@@ -82,7 +74,7 @@
 
 .noteTrashIconSideBar {
   top: 0.25rem !important;
-  left: -1.5rem !important;
+  left: 0rem !important;
   padding: 0 !important;
   margin: 0 !important;
   border: 2px solid red !important;
@@ -94,9 +86,8 @@
 }
 
 .NoteSideBar {
-  pointer-events: none;
   display: block;
-  z-index: 99999;
+  z-index: 2147483645;
   position: fixed;
   width: 17%;
   min-width: var(--min-SideBarWidth);
@@ -105,10 +96,9 @@
   top: 0;
   background-color: rgba(50, 50, 50, 0.8);
   transition: var(--transition-Speed) ease-in-out;
-  border-left: 2rem;
-  backdrop-filter: blur(8px) saturate(2);
-  -webkit-backdrop-filter: blur(8px) saturate(2);
-  overflow: hidden;
+  backdrop-filter: blur(var(--sidebar-blur-intensity)) saturate(2);
+  -webkit-backdrop-filter: blur(var(--sidebar-blur-intensity)) saturate(2);
+  overflow: visible;
 }
 
 .closed {
@@ -129,6 +119,23 @@
   outline: none;
   border: none;
   transition: var(--transition-Speed) ease-in-out;
+}
+
+.NoteSidebarButton {
+  position: absolute;
+  z-index: 2147483646;
+  height: 10rem;
+  top: calc(50% - 5rem);
+  width: 1.5rem;
+  left: -1.5rem;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  backdrop-filter: blur(var(--sidebar-blur-intensity)) saturate(2);
+  -webkit-backdrop-filter: blur(var(--sidebar-blur-intensity)) saturate(2);
 }
 
 @media (max-width: 850px) {

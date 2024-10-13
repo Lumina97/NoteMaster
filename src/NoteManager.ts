@@ -1,5 +1,5 @@
 import { createNewNoteHTML } from "./HTMLCreator";
-import { GetPageNotes } from "./main";
+import { GetPageNotes, sendCurrentNoteStatusToBackend } from "./main";
 import {
   ENoteOverlayStyle,
   GetCurrentNoteOverlayStyle,
@@ -21,6 +21,15 @@ export type NoteObj = {
   endContainerHTML?: HTMLElement;
 };
 
+let areNotesShowing = false;
+export const GetAreNotesShowing = () => {
+  return areNotesShowing;
+};
+export const SetAreNotesShowing = (showNotes: boolean) => {
+  areNotesShowing = showNotes;
+  sendCurrentNoteStatusToBackend();
+};
+
 export const deleteNote = (noteWrapperElement: NoteObj) => {
   if (noteWrapperElement === undefined) return;
 
@@ -29,20 +38,20 @@ export const deleteNote = (noteWrapperElement: NoteObj) => {
   noteWrapperElement.wrapperHTML.remove();
 };
 
-export const toggleNote = (element: HTMLElement, hideNotes: boolean) => {
+export const toggleNote = (element: HTMLElement, showNotes: boolean) => {
   if (element === undefined) return;
-  if (hideNotes) element.classList.add("closedOverlay");
-  else element.classList.remove("closedOverlay");
+  if (showNotes) element.classList.remove("closedOverlay");
+  else element.classList.add("closedOverlay");
 };
 
-export const setAllNotesDisplay = (hideNotesBoolean: boolean) => {
+export const setAllNotesDisplay = (showNotes: boolean) => {
   if (GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar) {
-    ToggleSideBar(hideNotesBoolean);
+    ToggleSideBar(showNotes);
   } else {
     const pageNotes = GetPageNotes();
     if (pageNotes.length <= 0) return;
     for (const note of pageNotes) {
-      toggleNote(note.textAreaHTML, hideNotesBoolean);
+      toggleNote(note.textAreaHTML, showNotes);
     }
   }
 };

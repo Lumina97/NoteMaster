@@ -12,7 +12,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "scripting", "contextMenus", "activeTab"],
+  "permissions": ["storage", "scripting", "contextMenus", "activeTab", "tabs"],
   "content_scripts": [
     {
       "js": ["content.js"],

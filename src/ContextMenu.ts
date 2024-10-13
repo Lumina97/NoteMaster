@@ -6,7 +6,7 @@ type TMessageType = {
   tabId: chrome.tabs.Tab;
 };
 
-//@ts-ignore
+let areNotesShowing: boolean = false;
 const genericOnClick = (
   info?: chrome.contextMenus.OnClickData,
   tab?: chrome.tabs.Tab
@@ -32,22 +32,42 @@ const genericOnClick = (
       dataToSend.message = JSON.stringify({ type: EMessageTypes.sidebar });
       sendMessage(dataToSend);
       break;
+    case "toggle":
+      dataToSend.message = JSON.stringify({
+        type: EMessageTypes.toggleNoteVisibility,
+      });
+      sendMessage(dataToSend).then((result) => {
+        console.log("got response");
+        updateContextMenu("toggle");
+      });
+      break;
   }
 };
 
+chrome.runtime.onMessage.addListener((request) => {
+  const message = JSON.parse(request);
+  console.log("updated status backend");
+  if (message.type === EMessageTypes.updateIsNoteShowing) {
+    areNotesShowing = message.result;
+    updateContextMenu("toggle");
+  }
+});
+
 const sendMessage = (message: TMessageType) => {
-  chrome.tabs.sendMessage(message.tabId.id!, message.message);
+  return chrome.tabs.sendMessage(message.tabId.id!, message.message);
+};
+
+const updateContextMenu = (contextMenuID: string) => {
+  chrome.contextMenus.update(contextMenuID, {
+    title: `${areNotesShowing ? "Hide" : "Show"} Notes`,
+  });
 };
 
 chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 chrome.runtime.onInstalled.addListener(() => {
-  //   // Create one test item for each context type.
-  //   let contexts = ["page", "selection", "link", "editable"];
-
   chrome.contextMenus.create({
     title: "Create Note",
-    //@ts-ignore
     contexts: ["selection"],
     id: "Create Note",
   });
@@ -55,6 +75,12 @@ chrome.runtime.onInstalled.addListener(() => {
   const main = chrome.contextMenus.create({
     title: "NoteMaster",
     id: "parent",
+  });
+
+  chrome.contextMenus.create({
+    title: `${areNotesShowing ? "Hide" : "Show"} Notes`,
+    parentId: main,
+    id: "toggle",
   });
 
   chrome.contextMenus.create({
@@ -68,13 +94,4 @@ chrome.runtime.onInstalled.addListener(() => {
     parentId: main,
     id: "sidebar",
   });
-
-  // chrome.contextMenus.create(
-  //   { title: "Oops", parentId: 999, id: "errorItem" },
-  //   function () {
-  //     if (chrome.runtime.lastError) {
-  //       console.log("Got expected error: " + chrome.runtime.lastError.message);
-  //     }
-  //   }
-  // );
 });

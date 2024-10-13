@@ -5,85 +5,92 @@
 
 import {
   ENoteOverlayStyle,
-  GetSideBar,
   ChangeOverlayStyle,
+  GetCurrentNoteOverlayStyle,
+  ToggleSideBar,
 } from "./noteDisplayOverlay";
 import {
   createNoteForSelectedText,
-  NoteObj,
+  NoteObj as TNoteObj,
   setAllNotesDisplay,
+  GetAreNotesShowing,
+  SetAreNotesShowing,
 } from "./NoteManager";
 import { EMessageTypes } from "./Types";
 
 //contains html elements for the notes.
-const pageNotes: NoteObj[] = [];
+const pageNotes: TNoteObj[] = [];
 export const GetPageNotes = () => {
   return pageNotes;
 };
-GetSideBar();
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+export const sendCurrentNoteStatusToBackend = async () => {
+  return chrome.runtime.sendMessage(
+    JSON.stringify({
+      type: EMessageTypes.updateIsNoteShowing,
+      result: GetAreNotesShowing(),
+    })
+  );
+};
+
+//listens to messages from the context menu background worker
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   const message = JSON.parse(request);
   if (message.type === EMessageTypes.overlay) {
-    console.log("overlay");
     ChangeOverlayStyle(ENoteOverlayStyle.overlay);
   } else if (message.type === EMessageTypes.sidebar) {
-    console.log("side");
     ChangeOverlayStyle(ENoteOverlayStyle.sidebar);
   } else if (message.type === EMessageTypes.create) {
-    console.log("create");
     createNoteForSelectedText();
+  } else if (message.type === EMessageTypes.toggleNoteVisibility) {
+    SetAreNotesShowing(!GetAreNotesShowing());
+    if (GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar)
+      ToggleSideBar(GetAreNotesShowing());
+    else setAllNotesDisplay(GetAreNotesShowing());
+    sendCurrentNoteStatusToBackend().then(() => {
+      sendResponse();
+    });
+    console.log(`notes: ${GetAreNotesShowing()}`);
+    return true;
   }
 });
 
-// addEventListener("beforeunload ", () => {
-//   unloadEvent();
-// });
+window.onbeforeunload = function (e) {
+  if (pageNotes.length > 0) {
+    // const noteStyles = [];
+    for (const note of pageNotes) {
+      // console.log(note.startContainerHTML?.);
+      // noteStyles.push(JSON.stringify(note));
+    }
+    // localStorage.setItem("Notes", JSON.stringify(noteStyles));
+  }
+};
 
-// const unloadEvent = () => {
-//   if (pageNotes.length > 0) {
-//     const noteStyles = [];
-//     for (const el of pageNotes) {
-//       noteStyles.push(convertStyleToJson(el));
-//     }
-//     localStorage.setItem("Notes", JSON.stringify(noteStyles));
-//   }
-// };
-
-// const convertStyleToJson = (element) => {
-//   return JSON.stringify({
-//     width: element.style.width,
-//     height: element.style.height,
-//     top: element.style.top,
-//     left: element.style.left,
-//     content: element.value,
-//   });
-// };
-
-//TODO Reimplement
-// const elementStyleString = localStorage.getItem("Notes");
-// if (elementStyleString) {
-//   const styleArray = JSON.parse(elementStyleString);
-//   for (const el of styleArray) {
-//     {
-//       const style = JSON.parse(el);
-//       const element = createNewNote(
-//         style.width,
-//         style.height,
-//         style.left,
-//         style.top,
-//         style.content
-//       );
-//       document.body.appendChild(element);
-//     }
-//   }
-// }
+window.onload = (e) => {
+  sendCurrentNoteStatusToBackend();
+  //   const elementStyleString = localStorage.getItem("Notes");
+  //   if (elementStyleString) {
+  //     const notes = JSON.parse(elementStyleString);
+  //     console.log(notes);
+  //     for (const note of notes) {
+  //       console.log(note);
+  //       // GetPageNotes().push(note);
+  //     }
+  //   }
+};
 
 document.body.onkeydown = (e) => {
   if (e.key === "=") createNoteForSelectedText();
   if (e.key === "4") ChangeOverlayStyle(ENoteOverlayStyle.overlay);
   if (e.key === "5") ChangeOverlayStyle(ENoteOverlayStyle.sidebar);
-
+  if (e.key === "1") {
+    if (pageNotes.length > 0) {
+      // const noteStyles = [];
+      for (const note of pageNotes) {
+        console.log(note.startContainerHTML?.outerHTML);
+      }
+    }
+  }
   if (e.key === "2") setAllNotesDisplay(false);
   if (e.key === "3") setAllNotesDisplay(true);
 };

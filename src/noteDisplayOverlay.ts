@@ -1,13 +1,33 @@
 import { SetHTMLClasses } from "./HTMLCreator";
 import { GetPageNotes } from "./main";
+import { GetAreNotesShowing, SetAreNotesShowing } from "./NoteManager";
 import { ResizeAllElements } from "./resize";
 
+export enum ENoteOverlayStyle {
+  overlay,
+  sidebar,
+}
 let sidebar: HTMLDivElement;
+let sidebarButton: HTMLDivElement;
+let currentNoteOverlayStyle: ENoteOverlayStyle = ENoteOverlayStyle.sidebar;
+
 const CreateSideBar = () => {
   sidebar = document.createElement("div");
   sidebar.classList.add("NoteSideBar");
-  if (currentNoteOverlayStyle === ENoteOverlayStyle.overlay)
+
+  sidebarButton = document.createElement("div");
+  sidebar.appendChild(sidebarButton);
+  sidebarButton.classList.add("NoteSidebarButton");
+  sidebarButton.addEventListener("click", () => {
+    SetAreNotesShowing(!GetAreNotesShowing());
+    ToggleSideBar(GetAreNotesShowing());
+  });
+
+  if (currentNoteOverlayStyle === ENoteOverlayStyle.overlay) {
     ToggleSideBar(true);
+    sidebarButton.style.display = "none";
+  }
+
   document.body.appendChild(sidebar);
 };
 
@@ -16,12 +36,6 @@ export const GetSideBar = () => {
   return sidebar;
 };
 
-export enum ENoteOverlayStyle {
-  overlay,
-  sidebar,
-}
-
-let currentNoteOverlayStyle: ENoteOverlayStyle = ENoteOverlayStyle.overlay;
 export const GetCurrentNoteOverlayStyle = () => {
   return currentNoteOverlayStyle;
 };
@@ -29,20 +43,24 @@ export const GetCurrentNoteOverlayStyle = () => {
 export const ChangeOverlayStyle = (newStyle: ENoteOverlayStyle) => {
   currentNoteOverlayStyle = newStyle;
 
+  if (currentNoteOverlayStyle === ENoteOverlayStyle.overlay) {
+    ToggleSideBar(false);
+    sidebarButton.style.display = "none";
+  } else {
+    ToggleSideBar(true);
+    sidebarButton.style.display = "block";
+  }
+
   for (const note of GetPageNotes()) {
     SetHTMLClasses(note, GetCurrentNoteOverlayStyle());
-    if (newStyle === ENoteOverlayStyle.overlay) {
+    if (newStyle === ENoteOverlayStyle.overlay)
       document.body.appendChild(note.wrapperHTML);
-      ToggleSideBar(true);
-    } else {
-      GetSideBar().appendChild(note.wrapperHTML);
-      ToggleSideBar(false);
-    }
+    else GetSideBar().appendChild(note.wrapperHTML);
   }
   ResizeAllElements();
 };
 
-export const ToggleSideBar = (hideSideBar: boolean) => {
-  if (hideSideBar) GetSideBar().classList.add("closed");
-  else GetSideBar().classList.remove("closed");
+export const ToggleSideBar = (showSideBar: boolean) => {
+  if (showSideBar) GetSideBar().classList.remove("closed");
+  else GetSideBar().classList.add("closed");
 };
