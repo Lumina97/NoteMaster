@@ -19,6 +19,7 @@ export type NoteObj = {
   trashIconHTML: HTMLElement;
   startContainerHTML?: HTMLElement;
   endContainerHTML?: HTMLElement;
+  initialScrollPosition: number;
 };
 
 let areNotesShowing = false;
@@ -59,11 +60,8 @@ export const setAllNotesDisplay = (showNotes: boolean) => {
 export const createNoteForSelectedText = () => {
   if (window.getSelection) {
     const sel = window.getSelection();
-    //check if anything is selected
     if (sel && sel.rangeCount) {
-      //get starting container of selection
       const start = sel.getRangeAt(0).startContainer.parentElement;
-      //get ending container - set to start if ending container does not exist
       let end = sel.getRangeAt(0).endContainer?.parentElement;
       if (!end) end = sel.getRangeAt(0).startContainer.parentElement;
       if (!start || !end) return;
@@ -76,6 +74,7 @@ export const createNoteForSelectedText = () => {
           : start.getBoundingClientRect().top + window.scrollY + "px";
 
       const NoteObject = createNewNoteHTML(width, height, left, top, "");
+      NoteObject.initialScrollPosition = window.scrollY;
       NoteObject.startContainerHTML = start;
       NoteObject.endContainerHTML = end;
       GetPageNotes().push(NoteObject);
@@ -108,10 +107,9 @@ export const calculateNoteWidthInPx = (
 };
 
 export const convertAbsoluteToRelativePosition = (
-  Note: NoteObj,
+  top: number,
   newParent: HTMLElement
 ) => {
   const parentTop = newParent.getBoundingClientRect().top;
-  const relativeTop = parseInt(Note.top) - parentTop;
-  Note.wrapperHTML.style.top = relativeTop + "px";
+  return top - parentTop;
 };

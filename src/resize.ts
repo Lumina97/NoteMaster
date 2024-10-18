@@ -15,9 +15,10 @@ const onPageScroll = () => {
   const notes = GetPageNotes();
   for (const note of notes) {
     if (!note.startContainerHTML || !note.endContainerHTML) continue;
-    const top = note.startContainerHTML.getBoundingClientRect().top + "px";
-    note.top = top;
-    convertAbsoluteToRelativePosition(note, GetSideBar());
+    const top =
+      parseInt(note.top) + (note.initialScrollPosition - window.scrollY);
+    convertAbsoluteToRelativePosition(top, GetSideBar());
+    note.wrapperHTML.style.top = top + "px";
   }
 };
 

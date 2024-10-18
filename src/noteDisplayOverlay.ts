@@ -22,6 +22,7 @@ const CreateSideBar = () => {
     SetAreNotesShowing(!GetAreNotesShowing());
     ToggleSideBar(GetAreNotesShowing());
   });
+  sidebarButton.innerHTML = `N\nO\nT\nE\nS`;
 
   if (currentNoteOverlayStyle === ENoteOverlayStyle.overlay) {
     ToggleSideBar(true);

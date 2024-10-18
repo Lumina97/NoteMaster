@@ -41,7 +41,7 @@ export const CreateHTMLFromNote = (note: NoteObj) => {
   const noteIcon = document.createElement("button");
   const trashIcon = document.createElement("button");
   const textArea = document.createElement("textarea");
-  textArea.value = note.content ? note.content : "Enter your note here";
+  textArea.value = note.content;
 
   trashIcon.addEventListener("click", () => {
     deleteNote(note);
@@ -54,6 +54,7 @@ export const CreateHTMLFromNote = (note: NoteObj) => {
 
   textArea.addEventListener("change", (e) => {
     textArea.innerHTML = (e.target as HTMLTextAreaElement).value;
+    note.content = textArea.innerHTML;
   });
 
   wrapper.appendChild(noteIcon);
@@ -64,6 +65,7 @@ export const CreateHTMLFromNote = (note: NoteObj) => {
   note.textAreaHTML = textArea;
   note.trashIconHTML = trashIcon;
   note.wrapperHTML = wrapper;
+  SetHTMLClasses(note, GetCurrentNoteOverlayStyle());
   return note;
 };
 
@@ -92,6 +94,7 @@ export const createNewNoteHTML = (
 
   textArea.addEventListener("change", (e) => {
     textArea.innerHTML = (e.target as HTMLTextAreaElement).value;
+    Note.content = textArea.innerHTML;
   });
 
   wrapper.appendChild(noteIcon);
@@ -108,6 +111,7 @@ export const createNewNoteHTML = (
     textAreaHTML: textArea,
     noteIconHTML: noteIcon,
     trashIconHTML: trashIcon,
+    initialScrollPosition: window.scrollY,
   };
   SetHTMLClasses(Note, GetCurrentNoteOverlayStyle());
 

@@ -35,7 +35,7 @@
   right: 0%;
   width: 100%;
   min-width: calc(var(--min-SideBarWidth) - 25px);
-  position: relative;
+  position: absolute;
 }
 
 .noteTrashIcon,
@@ -122,6 +122,8 @@
 }
 
 .NoteSidebarButton {
+  padding: 0.1rem;
+  padding-top: 1rem;
   position: absolute;
   z-index: 2147483646;
   height: 10rem;

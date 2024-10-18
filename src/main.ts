@@ -1,13 +1,15 @@
 //current limitations:
 //If you selected 3 containers and the center one is wider then both of them the note box will not  account for that
 //Box will span the entire element the text is in.
-//will break if page is reloaded in different size
+//Only works on fullscreen
 
+import { CreateHTMLFromNote } from "./HTMLCreator";
 import {
   ENoteOverlayStyle,
   ChangeOverlayStyle,
   GetCurrentNoteOverlayStyle,
   ToggleSideBar,
+  GetSideBar,
 } from "./noteDisplayOverlay";
 import {
   createNoteForSelectedText,
@@ -18,7 +20,6 @@ import {
 } from "./NoteManager";
 import { EMessageTypes } from "./Types";
 
-//contains html elements for the notes.
 const pageNotes: TNoteObj[] = [];
 export const GetPageNotes = () => {
   return pageNotes;
@@ -50,49 +51,37 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     sendCurrentNoteStatusToBackend().then(() => {
       sendResponse();
     });
-    console.log(`notes: ${GetAreNotesShowing()}`);
     return true;
   }
 });
 
-window.onbeforeunload = function (e) {
+window.onbeforeunload = function () {
+  localStorage.removeItem("Notes");
   if (pageNotes.length > 0) {
-    // const noteStyles = [];
+    setTimeout(() => {}, 1000);
+
+    const noteStyles = [];
     for (const note of pageNotes) {
-      // console.log(note.startContainerHTML?.);
-      // noteStyles.push(JSON.stringify(note));
+      noteStyles.push(JSON.stringify(note));
     }
-    // localStorage.setItem("Notes", JSON.stringify(noteStyles));
+    localStorage.setItem("Notes", JSON.stringify(noteStyles));
   }
 };
 
-window.onload = (e) => {
+window.onload = () => {
+  const noteString = localStorage.getItem("Notes");
+  if (noteString) {
+    const notesArrayJson = JSON.parse(noteString);
+    for (const noteJSON of notesArrayJson) {
+      console.log(noteJSON);
+      let noteObj = JSON.parse(noteJSON);
+      noteObj = CreateHTMLFromNote(noteObj);
+      GetPageNotes().push(noteObj);
+      if (GetCurrentNoteOverlayStyle() === ENoteOverlayStyle.sidebar)
+        GetSideBar().appendChild(noteObj.wrapperHTML);
+      else document.body.appendChild(noteObj.wrapperHTML);
+    }
+  }
   sendCurrentNoteStatusToBackend();
-  //   const elementStyleString = localStorage.getItem("Notes");
-  //   if (elementStyleString) {
-  //     const notes = JSON.parse(elementStyleString);
-  //     console.log(notes);
-  //     for (const note of notes) {
-  //       console.log(note);
-  //       // GetPageNotes().push(note);
-  //     }
-  //   }
 };
-
-document.body.onkeydown = (e) => {
-  if (e.key === "=") createNoteForSelectedText();
-  if (e.key === "4") ChangeOverlayStyle(ENoteOverlayStyle.overlay);
-  if (e.key === "5") ChangeOverlayStyle(ENoteOverlayStyle.sidebar);
-  if (e.key === "1") {
-    if (pageNotes.length > 0) {
-      // const noteStyles = [];
-      for (const note of pageNotes) {
-        console.log(note.startContainerHTML?.outerHTML);
-      }
-    }
-  }
-  if (e.key === "2") setAllNotesDisplay(false);
-  if (e.key === "3") setAllNotesDisplay(true);
-};
-
 export { pageNotes };

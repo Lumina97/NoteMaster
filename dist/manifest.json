@@ -1,18 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Hello Extension",
-  "description": "First Extension",
+  "name": "NoteMaster",
+  "description": "NoteMaster is a modern note taking extension that let's you link your notes to a certain paragraph on the page",
   "version": "1.0",
   "icons": {
-    "16": "images/icon-16.png",
-    "32": "images/icon-32.png",
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
+    "16": "images/Icon-16.png",
+    "32": "images/Icon-32.png",
+    "48": "images/Icon-48.png",
+    "128": "images/Icon-128.png"
   },
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "scripting", "contextMenus", "activeTab", "tabs"],
+  "permissions": ["storage", "scripting", "contextMenus", "activeTab"],
   "content_scripts": [
     {
       "js": ["content.js"],

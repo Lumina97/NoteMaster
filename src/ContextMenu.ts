@@ -46,7 +46,6 @@ const genericOnClick = (
 
 chrome.runtime.onMessage.addListener((request) => {
   const message = JSON.parse(request);
-  console.log("updated status backend");
   if (message.type === EMessageTypes.updateIsNoteShowing) {
     areNotesShowing = message.result;
     updateContextMenu("toggle");
