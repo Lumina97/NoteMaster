@@ -34,4 +34,4 @@ How to use:
 
   - To hide notes in the overlay mode just hit the green button next to the note or right click->NoteMaster->Hide notes/Show notes
   - To delete any note just hit the red button next to the note and will be deleted.
-  - ![overlay](https://github.com/user-attachments/assets/d2bd7f7a-e5ac-4fd7-9570-cd62bae9cdf6)
+   ![overlay](https://github.com/user-attachments/assets/d2bd7f7a-e5ac-4fd7-9570-cd62bae9cdf6)
